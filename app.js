@@ -166,7 +166,7 @@ if (typeof document !== 'undefined') {
     const display = remaining === null ? '—:—' : formatTime(remaining);
     $('countdown').textContent = display;
     $('progress').style.strokeDashoffset = idle ? '0' : String(100 * (1 - remaining / state.duration));
-    document.title = idle ? 'Tomatotimer — a little time, well spent' : `${display} · ${state.status === 'complete' ? 'Time’s up' : state.status === 'paused' ? 'Paused' : 'Tomatotimer'}`;
+    document.title = idle ? 'Tomatotimer' : `${display} · ${state.status === 'complete' ? 'Time’s up' : state.status === 'paused' ? 'Paused' : 'Tomatotimer'}`;
   }
   function render() {
     const idle = state.status === 'idle';
@@ -177,10 +177,10 @@ if (typeof document !== 'undefined') {
     $('random-inputs').hidden = state.mode !== 'random';
     // Hidden inputs cannot interfere with form submission or keyboard access.
     for (const [key, input] of Object.entries(inputs)) input.disabled = !idle || (state.mode === 'manual' ? ['minimum', 'maximum'].includes(key) : ['minutes', 'seconds'].includes(key));
-    $('state-label').textContent = { idle: 'Ready when you are', running: 'A moment, just for you', paused: 'Paused · take your time', complete: 'Time’s up. Nicely done.' }[state.status];
+    $('state-label').textContent = { idle: 'Ready', running: 'Running', paused: 'Paused', complete: 'Time’s up' }[state.status];
     $('dial-caption').textContent = idle && state.mode === 'random' ? 'LET CHANCE DECIDE' : state.status === 'running' ? 'RUNNING · MIN / SEC' : 'MINUTES / SECONDS';
-    $('session-summary').textContent = state.picked !== null ? `Picked ${state.picked} minutes from ${state.fields.minimum}–${state.fields.maximum}` : idle ? 'One thing at a time.' : `${formatTime(state.duration)} set aside for you.`;
-    $('setup-hint').textContent = idle ? (state.mode === 'manual' ? 'Anything from a second to just under an hour.' : 'We’ll pick a whole minute, including either end.') : state.status === 'complete' ? 'Go again, or make room for something new.' : 'Reset to change duration.';
+    $('session-summary').textContent = state.picked !== null ? `Picked ${state.picked} minutes from ${state.fields.minimum}–${state.fields.maximum}` : '';
+    $('setup-hint').textContent = idle ? (state.mode === 'manual' ? '1 second to 59 minutes, 59 seconds.' : 'Whole minutes · both ends included.') : state.status === 'complete' ? 'Repeat this duration or change the timer.' : 'Reset to change duration.';
     $('primary-action').textContent = { idle: state.mode === 'manual' ? 'Start timer ↗' : 'Pick & start ↗', running: 'Pause', paused: 'Resume', complete: 'Start again' }[state.status];
     $('reset-action').hidden = idle;
     $('reset-action').textContent = state.status === 'complete' ? 'Change timer' : 'Reset';
