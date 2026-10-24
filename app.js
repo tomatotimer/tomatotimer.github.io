@@ -87,6 +87,7 @@ if (typeof document !== 'undefined') {
   try { state = restoreState(sessionStorage.getItem(STORAGE_KEY)) || state; } catch { /* Storage is optional. */ }
   let timerInterval = null;
   let audioContext = null;
+  const activeChimeNotes = new Set();
   let hasSubmitted = false;
   const inputs = Object.fromEntries(Object.keys(DEFAULT_FIELDS).map(key => [key, $(key)]));
   for (const [key, input] of Object.entries(inputs)) input.value = state.fields[key];
@@ -115,24 +116,45 @@ if (typeof document !== 'undefined') {
       $('audio-note').hidden = audioContext.state !== 'closed';
     } catch { $('audio-note').hidden = false; }
   }
+  function stopChime() {
+    if (!audioContext) return;
+    const now = audioContext.currentTime;
+    for (const { oscillator, gain } of activeChimeNotes) {
+      const volume = gain.gain.value;
+      gain.gain.cancelScheduledValues(now);
+      gain.gain.setValueAtTime(volume, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.08);
+      oscillator.stop(now + 0.1);
+    }
+  }
   function chime() {
     if (!state.sound) return;
     if (!audioContext || audioContext.state !== 'running') { $('audio-note').hidden = false; return; }
     try {
-      for (const [offset, frequency] of [[0, 659.25], [0.24, 880]]) {
+      stopChime();
+      // A soft C-major arpeggio: three rounded attacks and overlapping tails.
+      // The final note fades to silence about six seconds after completion.
+      for (const [offset, frequency] of [[0, 523.25], [0.9, 659.25], [1.8, 783.99]]) {
         const oscillator = audioContext.createOscillator();
         const gain = audioContext.createGain();
         const start = audioContext.currentTime + offset;
         oscillator.type = 'sine';
         oscillator.frequency.value = frequency;
         gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(0.16, start + 0.015);
-        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.65);
+        gain.gain.linearRampToValueAtTime(0.1, start + 0.09);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + 4);
+        gain.gain.linearRampToValueAtTime(0, start + 4.2);
         oscillator.connect(gain);
         gain.connect(audioContext.destination);
         oscillator.start(start);
-        oscillator.stop(start + 0.7);
-        oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+        oscillator.stop(start + 4.25);
+        const note = { oscillator, gain };
+        activeChimeNotes.add(note);
+        oscillator.onended = () => {
+          oscillator.disconnect();
+          gain.disconnect();
+          activeChimeNotes.delete(note);
+        };
       }
     } catch { $('audio-note').hidden = false; }
   }
@@ -170,6 +192,7 @@ if (typeof document !== 'undefined') {
     timerInterval = state.status === 'running' ? setInterval(tick, 200) : null;
   }
   function change(action, duration, picked) {
+    if (action === 'start' || action === 'reset') stopChime();
     const previous = state.status;
     state = transition(state, action, Date.now(), duration, picked);
     if (state.status === 'complete' && previous !== 'complete') { announce('Time’s up. Your timer is complete.'); chime(); }
@@ -222,7 +245,7 @@ if (typeof document !== 'undefined') {
   $('sound').addEventListener('change', () => {
     state.sound = $('sound').checked;
     if (state.sound) prepareAudio();
-    else $('audio-note').hidden = true;
+    else { stopChime(); $('audio-note').hidden = true; }
     save();
     render();
   });
