@@ -4,8 +4,8 @@ const { validate, pickMinutes, formatTime, createState, remainingTime, transitio
 const fields = (overrides = {}) => ({ ...createState().fields, ...overrides });
 
 test('manual boundaries and invalid input', () => {
-  for (const [minutes, seconds] of [['0', '1'], ['59', '59']]) assert.equal(validate('manual', fields({ minutes, seconds })).valid, true);
-  for (const [minutes, seconds] of [['0', '0'], ['60', '0'], ['', '1'], ['-1', '0'], ['1.5', '0'], ['abc', '0'], ['0', '60'], ['1e1', '0']]) assert.equal(validate('manual', fields({ minutes, seconds })).valid, false);
+  for (const [minutes, seconds] of [['0', '1'], ['', '1'], ['  ', '30'], ['59', '59']]) assert.equal(validate('manual', fields({ minutes, seconds })).valid, true);
+  for (const [minutes, seconds] of [['0', '0'], ['60', '0'], ['', '0'], ['0', ''], ['-1', '0'], ['1.5', '0'], ['abc', '0'], ['0', '60'], ['1e1', '0']]) assert.equal(validate('manual', fields({ minutes, seconds })).valid, false);
 });
 test('random validates inclusive bounds and equal endpoints', () => {
   for (const [minimum, maximum] of [['1', '59'], ['17', '25'], ['25', '25']]) assert.equal(validate('random', fields({ minimum, maximum })).valid, true);
@@ -60,8 +60,17 @@ test('random session persists exact selection through reload, pause, resume and 
 });
 test('restoration rejects corrupt state and allows expired sessions to finish', () => {
   for (const raw of [null, '', 'null', '{}', 'bad', '{"version":2}']) assert.equal(restoreState(raw), null);
-  const s = transition(createState(), 'start', 1000, 25 * 60000, null);
+  const s = transition({ ...createState(), fields: fields({ minutes: '25' }) }, 'start', 1000, 25 * 60000, null);
   for (const patch of [{ deadline: null }, { duration: 3600000 }, { fields: {} }, { remaining: -1 }, { mode: 'bad' }, { status: 'paused', remaining: 0, deadline: null }, { picked: 3 }]) assert.equal(restoreState(JSON.stringify({ version: 1, state: { ...s, ...patch } })), null);
   const restored = restoreState(JSON.stringify({ version: 1, state: s }));
   assert.equal(transition(restored, 'tick', 9999999).status, 'complete');
+});
+
+test('empty manual minutes default to zero and restore a seconds-only session', () => {
+  assert.equal(createState().fields.minutes, '0');
+  assert.equal(validate('manual', fields({ minutes: '', seconds: '30' })).values.minutes, 0);
+  assert.equal(validate('manual', fields()).fieldsValid, true);
+  assert.equal(validate('manual', fields()).valid, false);
+  const s = transition({ ...createState(), fields: fields({ minutes: '', seconds: '30' }) }, 'start', 1000, 30000, null);
+  assert.equal(restoreState(JSON.stringify({ version: 1, state: s })).duration, 30000);
 });

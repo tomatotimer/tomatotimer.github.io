@@ -1,25 +1,27 @@
 'use strict';
 
 const MAX_DURATION = 3599000;
-const DEFAULT_FIELDS = { minutes: '25', seconds: '0', minimum: '17', maximum: '25' };
+const DEFAULT_FIELDS = { minutes: '0', seconds: '0', minimum: '17', maximum: '25' };
 
 function validate(mode, fields) {
   const errors = {};
   const keys = mode === 'manual' ? ['minutes', 'seconds'] : ['minimum', 'maximum'];
   const values = {};
   for (const key of keys) {
-    const raw = String(fields[key] ?? '').trim();
+    const entered = String(fields[key] ?? '').trim();
+    const raw = mode === 'manual' && key === 'minutes' && entered === '' ? '0' : entered;
     const min = mode === 'manual' ? 0 : 1;
     if (!/^\d+$/.test(raw) || Number(raw) < min || Number(raw) > 59) {
       errors[key] = `Enter a whole number from ${min} to 59.`;
     }
     values[key] = Number(raw);
   }
-  if (Object.keys(errors).length === 0) {
+  const fieldsValid = Object.keys(errors).length === 0;
+  if (fieldsValid) {
     if (mode === 'manual' && values.minutes === 0 && values.seconds === 0) errors.seconds = 'Set at least 1 second.';
     if (mode === 'random' && values.minimum > values.maximum) errors.maximum = 'Maximum must be at least the minimum.';
   }
-  return { errors, values, valid: Object.keys(errors).length === 0 };
+  return { errors, values, fieldsValid, valid: Object.keys(errors).length === 0 };
 }
 
 function pickMinutes(min, max, random = Math.random) {
@@ -161,7 +163,7 @@ if (typeof document !== 'undefined') {
   function renderTime() {
     const idle = state.status === 'idle';
     const checked = validate(state.mode, state.fields);
-    const preview = state.mode === 'manual' && checked.valid ? (checked.values.minutes * 60 + checked.values.seconds) * 1000 : null;
+    const preview = state.mode === 'manual' && checked.fieldsValid ? (checked.values.minutes * 60 + checked.values.seconds) * 1000 : null;
     const remaining = idle ? preview : remainingTime(state, Date.now());
     const display = remaining === null ? '—:—' : formatTime(remaining);
     $('countdown').textContent = display;
