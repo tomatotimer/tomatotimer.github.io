@@ -34,7 +34,7 @@ function formatTime(milliseconds) {
 }
 
 function createState() {
-  return { status: 'idle', mode: 'manual', fields: { ...DEFAULT_FIELDS }, duration: 0, remaining: 0, deadline: null, picked: null, sound: false };
+  return { status: 'idle', mode: 'manual', fields: { ...DEFAULT_FIELDS }, duration: 0, remaining: 0, deadline: null, picked: null, sound: true };
 }
 
 function remainingTime(state, now) {
@@ -173,7 +173,6 @@ if (typeof document !== 'undefined') {
   function render() {
     const idle = state.status === 'idle';
     document.body.dataset.state = state.status;
-    $('mode-fields').disabled = !idle;
     $('duration-fields').disabled = !idle;
     $('manual-inputs').hidden = state.mode !== 'manual';
     $('random-inputs').hidden = state.mode !== 'random';
@@ -239,8 +238,8 @@ if (typeof document !== 'undefined') {
     state.mode = input.value;
     hasSubmitted = false;
     showErrors();
-    save();
-    render();
+    change('reset');
+    announce(`${state.mode === 'manual' ? 'Set timer' : 'Random timer'} selected. Timer reset.`);
   }));
   $('sound').addEventListener('change', () => {
     state.sound = $('sound').checked;
