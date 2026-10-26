@@ -7,8 +7,8 @@
     <meta name="description" content="Set a timer or choose a random duration with Tomatotimer.">
     <title>Tomatotimer</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='18' r='12' fill='%23b83b2c'/%3E%3Cpath d='M16 9V3M10 6l6 3 6-3' stroke='%233b6045' stroke-width='3' fill='none'/%3E%3C/svg%3E">
-    <link rel="stylesheet" href="styles.css?v=5cf724c670">
-    <script src="app.js?v=076baa8f71" defer></script>
+    <link rel="stylesheet" href="styles.css?v=61438bd1cf">
+    <script src="app.js?v=d3e17663f1" defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -29,7 +29,7 @@
             <div id="random-inputs" class="input-row" hidden><div class="field"><label for="minimum">Min minutes</label><input id="minimum" name="minimum" type="number" inputmode="numeric" min="1" max="59" step="1" value="17" aria-describedby="minimum-error"><span id="minimum-error" class="field-error"></span></div><span class="input-divider range-divider" aria-hidden="true">–</span><div class="field"><label for="maximum">Max minutes</label><input id="maximum" name="maximum" type="number" inputmode="numeric" min="1" max="59" step="1" value="25" aria-describedby="maximum-error"><span id="maximum-error" class="field-error"></span></div></div>
           </fieldset>
           <p id="setup-hint" class="setup-hint">1 second to 59 minutes, 59 seconds.</p>
-          <div class="actions"><button id="primary-action" class="primary" type="submit">Start timer <span aria-hidden="true">↗</span></button><button id="reset-action" class="secondary" type="button" hidden>Reset</button></div>
+          <div class="actions"><button id="primary-action" class="primary" type="submit">Start timer <span aria-hidden="true">↗</span></button><button id="reset-action" class="secondary" type="button">Reset</button></div>
         </form>
         <div class="sound-row"><label class="sound-control"><input id="sound" type="checkbox" role="switch"><span class="switch-track" aria-hidden="true"></span><span>Chime when done</span></label><span id="sound-status">Sound off</span></div>
         <p id="audio-note" class="audio-note" hidden>Sound is unavailable in this browser. Your timer will still finish on screen.</p>

@@ -355,11 +355,13 @@ fieldset {
 }
 
 .actions {
-  display:flex;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 96px;
   gap:10px;
 }
 
 .actions button {
+  min-width:0;
   min-height:44px;
   border-radius:9px;
   font-size:13px;
