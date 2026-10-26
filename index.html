@@ -7,8 +7,8 @@
     <meta name="description" content="Set a timer or choose a random duration with Tomatotimer.">
     <title>Tomatotimer</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='18' r='12' fill='%23b83b2c'/%3E%3Cpath d='M16 9V3M10 6l6 3 6-3' stroke='%233b6045' stroke-width='3' fill='none'/%3E%3C/svg%3E">
-    <link rel="stylesheet" href="styles.css?v=61438bd1cf">
-    <script src="app.js?v=dbef1f9b4a" defer></script>
+    <link rel="stylesheet" href="styles.css?v=0a17480eb7">
+    <script src="app.js?v=f8615ddc97" defer></script>
   </head>
   <body>
     <header class="site-header">
@@ -19,7 +19,7 @@
       <section class="timer-card" aria-label="Timer">
         <div class="dial">
           <svg class="ring" viewBox="0 0 300 300" aria-hidden="true"><circle class="ring-track" cx="150" cy="150" r="141"/><circle id="progress" class="ring-progress" cx="150" cy="150" r="141" pathLength="100"/></svg>
-          <div class="dial-content"><span id="state-label" class="state-label">Ready</span><div id="countdown" role="timer" aria-live="off" aria-label="Time remaining">00:00</div><span id="dial-caption">MINUTES / SECONDS</span></div>
+          <div class="dial-content"><span id="state-label" class="state-label">Ready</span><div class="countdown-display" role="group" aria-label="Timer duration"><input id="dial-minutes" type="text" inputmode="numeric" maxlength="2" pattern="[0-9]*" value="00" placeholder="00" autocomplete="off" aria-label="Timer minutes" aria-describedby="minutes-error" title="Click to set minutes"><span aria-hidden="true">:</span><input id="dial-seconds" type="text" inputmode="numeric" maxlength="2" pattern="[0-9]*" value="00" placeholder="00" autocomplete="off" aria-label="Timer seconds" aria-describedby="seconds-error" title="Click to set seconds"></div><span id="countdown" class="sr-only" role="timer" aria-live="off" aria-label="Time remaining">00:00</span><span id="dial-caption">MINUTES / SECONDS</span></div>
         </div>
         <p id="session-summary" class="session-summary"></p>
         <form id="timer-form" novalidate>

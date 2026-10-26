@@ -167,6 +167,17 @@ if (typeof document !== 'undefined') {
     const remaining = idle ? preview : remainingTime(state, Date.now());
     const display = remaining === null ? '—:—' : formatTime(remaining);
     $('countdown').textContent = display;
+    const [minutes, seconds] = idle && state.mode === 'manual'
+      ? ['minutes', 'seconds'].map(key => {
+        const value = state.fields[key].trim() || '0';
+        return /^\d{1,2}$/.test(value) ? value.padStart(2, '0') : '—';
+      })
+      : display.split(':');
+    for (const [key, value] of [['minutes', minutes], ['seconds', seconds]]) {
+      const input = $('dial-' + key);
+      if ((document.activeElement !== input || !idle) && input.value !== value) input.value = value;
+      input.setAttribute('aria-invalid', inputs[key].getAttribute('aria-invalid') || 'false');
+    }
     $('progress').style.strokeDashoffset = idle ? '0' : String(100 * (1 - remaining / state.duration));
     document.title = idle ? 'Tomatotimer' : `${display} · ${state.status === 'complete' ? 'Time’s up' : state.status === 'paused' ? 'Paused' : 'Tomatotimer'}`;
   }
@@ -234,6 +245,55 @@ if (typeof document !== 'undefined') {
     save();
     renderTime();
   });
+  for (const key of ['minutes', 'seconds']) {
+    const dialInput = $('dial-' + key);
+    dialInput.addEventListener('focus', () => {
+      if (state.status === 'idle' && state.mode === 'manual') dialInput.value = state.fields[key];
+      dialInput.select();
+    });
+    dialInput.addEventListener('input', () => {
+      const entered = dialInput.value;
+      if (!/^\d{0,2}$/.test(entered)) {
+        dialInput.value = state.fields[key];
+        return;
+      }
+      if (state.status !== 'idle' || state.mode !== 'manual') {
+        if (state.status !== 'idle') {
+          const [minutes, seconds] = formatTime(remainingTime(state, Date.now())).split(':');
+          state.fields.minutes = minutes;
+          state.fields.seconds = seconds;
+          inputs.minutes.value = minutes;
+          inputs.seconds.value = seconds;
+        }
+        state.mode = 'manual';
+        document.querySelector('input[name="mode"][value="manual"]').checked = true;
+        hasSubmitted = false;
+        showErrors();
+        change('reset');
+        announce('Timer reset. Edit minutes and seconds, then press Start timer.');
+      }
+      dialInput.value = entered;
+      inputs[key].value = entered;
+      readFields();
+      showErrors(validate('manual', state.fields).errors);
+      save();
+      renderTime();
+    });
+    dialInput.addEventListener('blur', () => {
+      if (dialInput.value === '') {
+        inputs[key].value = '0';
+        readFields();
+        save();
+      }
+      renderTime();
+    });
+    dialInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        $('primary-action').focus();
+      }
+    });
+  }
   document.querySelectorAll('input[name="mode"]').forEach(input => input.addEventListener('change', () => {
     state.mode = input.value;
     hasSubmitted = false;

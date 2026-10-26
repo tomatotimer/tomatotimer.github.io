@@ -196,12 +196,40 @@ main {
   color:var(--muted);
 }
 
-#countdown {
+.countdown-display {
+  display:flex;
+  align-items:center;
   font-size:clamp(44px, min(12vw, 9svh), 68px);
   font-weight:450;
   line-height:1;
   letter-spacing:-4px;
   font-variant-numeric:tabular-nums;
+}
+
+.countdown-display input {
+  width:2.15ch;
+  min-width:0;
+  padding:0;
+  border:0;
+  border-bottom:1px solid transparent;
+  border-radius:4px;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  letter-spacing:inherit;
+  font-variant-numeric:inherit;
+  text-align:center;
+  cursor:text;
+}
+
+.countdown-display input:hover {
+  border-bottom-color:var(--control-border);
+}
+
+.countdown-display input:focus {
+  outline:2px solid var(--green);
+  outline-offset:2px;
+  background:var(--soft);
 }
 
 #dial-caption {
@@ -558,7 +586,7 @@ body[data-state=complete] .state-label {
   .sound-control {
     font-size:12px;
   }
-  #countdown {
+  .countdown-display {
     letter-spacing:-3px;
   }
 }
