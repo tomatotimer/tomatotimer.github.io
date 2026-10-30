@@ -197,7 +197,10 @@ main {
 }
 
 .countdown-display {
-  display:flex;
+  display:grid;
+  grid-template-columns:2.15ch .3ch 2.15ch;
+  width:4.6ch;
+  height:1.2em;
   align-items:center;
   font-size:clamp(44px, min(12vw, 9svh), 68px);
   font-weight:450;
@@ -207,7 +210,8 @@ main {
 }
 
 .countdown-display input {
-  width:2.15ch;
+  width:100%;
+  height:100%;
   min-width:0;
   padding:0;
   border:0;
@@ -216,6 +220,7 @@ main {
   background:transparent;
   color:inherit;
   font:inherit;
+  line-height:1;
   letter-spacing:inherit;
   font-variant-numeric:inherit;
   text-align:center;
@@ -239,6 +244,9 @@ main {
   max-width:76%;
   text-align:center;
   line-height:1.5;
+  min-height:3em;
+  display:grid;
+  place-items:center;
   color:var(--muted);
 }
 
@@ -247,11 +255,8 @@ main {
   font-size:12px;
   color:var(--muted);
   line-height:1.5;
+  min-height:1.5em;
   margin:6px 0 10px;
-}
-
-.session-summary:empty {
-  display:none;
 }
 
 fieldset {
