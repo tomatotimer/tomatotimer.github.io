@@ -1,0 +1,25 @@
+{
+  "scanned": "2026-10-30",
+  "findings": {
+    "fonts": "styles.css:13 system sans, framework default",
+    "palette": "styles.css:3-12 tomato red, warm paper, green sound switch",
+    "framework": "README.md:3 dependency-free static HTML, CSS and JS",
+    "routes": [
+      "/ (index.html), app screen"
+    ],
+    "motion": "styles.css:180 progress transition"
+  },
+  "preserve": [
+    "tomato SVG and favicon",
+    "brand red #b83b2c",
+    "warm paper #f7f5ef",
+    "all timer wiring and session restoration"
+  ],
+  "introduce": [
+    "Grid type system",
+    "local fonts",
+    "split timer and controls layout",
+    "responsive controls",
+    "tokens.css and base.css"
+  ]
+}
